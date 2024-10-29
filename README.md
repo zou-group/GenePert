@@ -30,7 +30,7 @@ The complete list of embeddings and datasets used can be obtained from the follo
 	- Pretrained Geneformer embeddings 
 	- Pretrained scGPT embeddings
 
-![](https://github.com/zou-group/GenePert/blob/main/figures/GenePert_fig1.png)
+![Overview of the GenePert process: (a) Data from pooled perturbation screens with high-throughput readouts (for instance, single-cell RNA sequencing) serve as input for the GenePert model. (b) For each gene being perturbed, we use its GenePT embedding as its feature: that is, we first extract its corresponding gene information summary from NCBI and, if available, its protein summary from UniProt, and use OpenAI's Model 3 text embedding of the summary as its representation. (c) For training, GenePert uses ridge regression, which posits a linear relationship between the average regulatory effects (left matrix X) of perturbations (rows) and the gene features (right matrix G). (d) During testing, for an unseen perturbation, GenePert uses the fitted coefficients on the corresponding GenePT embedding to generate predictions.](https://github.com/zou-group/GenePert/blob/main/figures/GenePert_fig1.png)
 
 
 
