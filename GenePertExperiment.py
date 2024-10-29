@@ -206,7 +206,7 @@ class GenePertExperiment:
 
     def run_experiment_with_conditions(self, train_conditions, test_conditions, condition_column = "condition", \
         ridge_params=None, knn_params=None, hidden_size=128, mlp_epochs=10, val_split=0.2, use_mlp=False,\
-        condition_strategy_list = ['mean','median']):
+        condition_strategy_list = ['mean','median'], mean_baseline=True):
         """
         Function to run the experiment using provided train/test conditions directly, including MLP training with validation split.
 
@@ -269,21 +269,22 @@ class GenePertExperiment:
         results_per_gene = {}
 
         # TrainConditionModel evaluation
-        for condition_strategy in condition_strategy_list:
-            condition_model = TrainConditionModel(strategy=condition_strategy)
-            condition_model.fit(X_train, y_train)
-            y_pred_condition = condition_model.predict(X_test)
+        if mean_baseline:
+            for condition_strategy in condition_strategy_list:
+                condition_model = TrainConditionModel(strategy=condition_strategy)
+                condition_model.fit(X_train, y_train)
+                y_pred_condition = condition_model.predict(X_test)
 
-            # Evaluate row-wise (gene-wise) performance for TrainConditionModel
-            mse_condition, mae_condition, corr_condition = self.evaluate_performance_rowwise(y_test, y_pred_condition)
-            run_results['train_condition'][condition_strategy] = {'mse': np.mean(mse_condition), 'mae': np.mean(mae_condition), 'corr': np.mean(corr_condition)}
+                # Evaluate row-wise (gene-wise) performance for TrainConditionModel
+                mse_condition, mae_condition, corr_condition = self.evaluate_performance_rowwise(y_test, y_pred_condition)
+                run_results['train_condition'][condition_strategy] = {'mse': np.mean(mse_condition), 'mae': np.mean(mae_condition), 'corr': np.mean(corr_condition)}
 
-            # Save per-gene performance results including y_pred_condition
-            for i, gene_name in enumerate(test_gene_name_X_map):
-                if gene_name not in results_per_gene:
-                    results_per_gene[gene_name] = {'ridge': {}, 'knn': {}, 'mlp': {}, 'train_condition': {}}
-                results_per_gene[gene_name]['train_condition'][condition_strategy] = (corr_condition[i], mse_condition[i], y_pred_condition[i], y_test[i],
-                     distance_results['closest_distances'][i],distance_results['avg_top10_distances'][i])
+                # Save per-gene performance results including y_pred_condition
+                for i, gene_name in enumerate(test_gene_name_X_map):
+                    if gene_name not in results_per_gene:
+                        results_per_gene[gene_name] = {'ridge': {}, 'knn': {}, 'mlp': {}, 'train_condition': {}}
+                    results_per_gene[gene_name]['train_condition'][condition_strategy] = (corr_condition[i], mse_condition[i], y_pred_condition[i], y_test[i],
+                         distance_results['closest_distances'][i],distance_results['avg_top10_distances'][i])
 
         # Ridge Regression evaluation
         for ridge_param in ridge_params:
@@ -475,7 +476,9 @@ class GenePertExperiment:
 
         return results
 
-    def run_kfold_experiments(self, ridge_params=None, knn_params=None, hidden_size=128, mlp_epochs=100, k=10, use_mlp=False,condition_strategy_list = ['mean','median'],output_dir="./train_test_index"):
+    def run_kfold_experiments(self, ridge_params=None, knn_params=None, hidden_size=128, mlp_epochs=100, k=10, \
+        use_mlp=False,condition_strategy_list = ['mean','median'],output_dir="./train_test_index",\
+        mean_baseline=True):
         """
         Run the experiment using k-fold cross-validation and return average and std results across folds.
 
@@ -515,18 +518,19 @@ class GenePertExperiment:
                 hidden_size=hidden_size,
                 mlp_epochs=mlp_epochs,
                 use_mlp=use_mlp,
-                condition_strategy_list=condition_strategy_list
+                condition_strategy_list=condition_strategy_list,
+                mean_baseline=mean_baseline
             )
 
-                    # Save the train and test conditions to a JSON file
-            conditions_split = {
-                'train': train_conditions.tolist(),
-                'test': test_conditions.tolist()
-            }
+            # Save the train and test conditions to a JSON file
+            # conditions_split = {
+            #     'train': train_conditions.tolist(),
+            #     'test': test_conditions.tolist()
+            # }
 
-            json_filename = os.path.join(output_dir, f'fold_{fold + 1}_conditions.json')
-            with open(json_filename, 'w') as json_file:
-                json.dump(conditions_split, json_file, indent=4)
+            # json_filename = os.path.join(output_dir, f'fold_{fold + 1}_conditions.json')
+            # with open(json_filename, 'w') as json_file:
+            #     json.dump(conditions_split, json_file, indent=4)
 
             # Accumulate the results from this fold
             fold_results = results['aggregate']

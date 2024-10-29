@@ -169,7 +169,7 @@ def get_gene_predictions(accumulated_results, best_model):
 
 
 def run_experiments_with_embeddings(experiment, embedding_pairs, ridge_params=None, knn_params=None, k=5, mlp_epochs=55, use_mlp=False,\
-    condition_strategy_list=['mean','median'], output_dir = "./"):
+    condition_strategy_list=['mean','median'], mean_baseline = True,output_dir = "./"):
     """
     Run experiments for multiple embeddings and store the results.
     
@@ -206,6 +206,7 @@ def run_experiments_with_embeddings(experiment, embedding_pairs, ridge_params=No
             use_mlp=use_mlp,
             condition_strategy_list=condition_strategy_list,
             output_dir=output_dir,
+            mean_baseline=mean_baseline
         )
 
         # Get the best overall MSE and correlation
@@ -241,8 +242,6 @@ def run_experiments_with_embeddings(experiment, embedding_pairs, ridge_params=No
             'ranked_genes': ranked_genes,  # Save the ranked genes
             'gene_predictions': gene_predictions  # Save gene predictions (y_pred and y_test)
         }
-
-
 
         # Output progress
         print(f"Finished experiment for embedding: {embedding_name}")
@@ -351,7 +350,7 @@ def plot_mse_corr_comparison(results_comparison, dataset_name, axis_a_lift = 0.0
         print(f"\\end{{tabular}}\n\\caption{{Mean and standard deviation of RMSE (scaled) and correlation for {dataset_name}.}}\n\\end{{table}}")
 
 
-def compare_embedding_correlations(results):
+def compare_embedding_correlations(results, output_dir='./'):
     """
     Compare correlation values between pairs of embeddings using scatter plots.
     
@@ -402,4 +401,5 @@ def compare_embedding_correlations(results):
             # Display the plot
             plt.grid(True)
             plt.tight_layout()
-            plt.show()
+            plt.savefig(f"{output_dir}/comparing_{emb_name_1}_vs_{emb_name_2}.svg", dpi=350)
+
