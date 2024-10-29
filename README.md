@@ -16,6 +16,12 @@ The complete list of embeddings and datasets used can be obtained from the follo
 - Perturb-seq Datasets:
 	- K562 Essential (Replogle et al. 2022)
 	- RPE1 Essential (Replogle et al. 2022)
+	- Tian et al. CRISPRa
+	- Adamson et al. CRISPRi
+	- Norman et al. CRISPRi
+	- Dixit et al. CRISPRi
+	- Wessels et al. CRISPR-Cas13d
+	- Xu et al. CRISPR-dCas9
 
 - Different pre-trained embedding models:
 	- GenePert (GPT-4)
@@ -24,7 +30,7 @@ The complete list of embeddings and datasets used can be obtained from the follo
 	- Pretrained Geneformer embeddings 
 	- Pretrained scGPT embeddings
 
-![](https://github.com/yiqunchen/GenePert/blob/main/man/figures/combined_plot_exp_7_cell_29_paper_example.png)
+![](https://github.com/zou-group/GenePert/blob/main/figures/GenePert_fig1.png)
 
 
 
